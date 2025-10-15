@@ -1,12 +1,15 @@
-import Counter2 from './Counter2';
-import MyComponent3 from './MyComponent3';
+import { useRef } from 'react';
 import './App.css'
 
 function App() {
+  const inputRef = useRef(null);
 
   return (
     <>
-      <Counter2 />
+      <input ref={inputRef} />
+      <br />
+      <br />
+      <button onClick={() => inputRef.current.focus()}>강제 포커스 활성화</button>
     </>
   );
 }
