@@ -1,16 +1,11 @@
-import { useRef } from 'react';
+import Counter4 from './Counter4';
 import './App.css'
 
 function App() {
-  const inputRef = useRef(null);
+
 
   return (
-    <>
-      <input ref={inputRef} />
-      <br />
-      <br />
-      <button onClick={() => inputRef.current.focus()}>강제 포커스 활성화</button>
-    </>
+      <Counter4 />
   );
 }
 
