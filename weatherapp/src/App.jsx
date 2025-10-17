@@ -21,11 +21,18 @@ function App() {
     .catch(error => console.log(error))
   }, []);
 
-  return (
-    <>
-
-    </>
-  );
+  if(weather.icon) {
+    return (
+      <>
+        <p>기온 : {weather.temp}</p>
+        <p>설명 : {weather.desc}</p>
+        <img src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`} alt="날씨 아이콘" />
+      </>
+    );
+  }
+  else {
+    return <div>Loading ...</div>
+  }
 }
 
 export default App
