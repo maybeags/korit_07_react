@@ -2,7 +2,11 @@ import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } 
 import { useState } from "react";
 import { Item } from "./App";
 
-function AddItem(props) {
+type AddItemProps = {
+  addItem: (item: Item) => void;
+}
+
+function AddItem(props: AddItemProps) {
   const [ open, setOpen ] = useState(false);
   const [ item, setItem ] = useState<Item>({
     product: '',
@@ -17,9 +21,17 @@ function AddItem(props) {
     setOpen(false);
   }
 
+  // App.tsx의 addItem 함수를 호출하고, item 상태를 전달
+  const addItem = () => {
+    props.addItem(item);
+    // TextField에 있는 내용을 다 지우고 Modal을 닫음
+    setItem({product: '', amount: ''});
+    handleClose();
+  }
+
   return(
     <>
-      <Button onClick={handleOpen}>
+      <Button onClick={handleOpen} variant="outlined">
         Add Item
       </Button>
       <Dialog open={open} onClose={handleClose}>
