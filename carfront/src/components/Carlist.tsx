@@ -1,18 +1,43 @@
-import { CarResponse } from "../types";
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+// import { CarResponse } from "../types"; table 태그에서는 data.map() 때문에 필요하지만, x-data-grid 사용 이후로는 필요 없기 때문에 주석 처리 했습니다.
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { getCars, deleteCar } from "../api/carapi";
+import { DataGrid, GridColDef, GridCellParams } from "@mui/x-data-grid";
 
 function Carlist() {
-  const getCars = async (): Promise<CarResponse[]> => {
-    const response = await axios.get("http://localhost:8080/api/cars");
-
-    return response.data._embedded.cars;
-  }
-
   const { data, error, isSuccess } = useQuery({
     queryKey: ["cars"],
     queryFn: getCars
   });
+
+  const { mutate } = useMutation(deleteCar, {
+    onSuccess: () => {
+      // 자동차 삭제 이후 실행되는 로직
+    }
+  })
+
+  const columns: GridColDef[] = [
+    {field: 'brand', headerName: 'Brand', width: 200},
+    {field: 'model', headerName: 'Model', width: 200},
+    {field: 'color', headerName: 'Color', width: 200},
+    {field: 'registrationNumber', headerName: 'Reg.nr', width: 150},
+    {field: 'modelYear', headerName: 'Model Year', width: 150},
+    {field: 'price', headerName: 'Price', width: 150},
+    {
+      field: 'delete',
+      headerName: '',
+      width: 90,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params: GridCellParams) => (
+        <button 
+          onClick={() => alert(params.row._links.self.href)}
+        >
+          Delete
+        </button>
+      )
+    }
+  ];
 
   if(!isSuccess) {
     return <span>Loading... 🔮</span>
@@ -23,22 +48,27 @@ function Carlist() {
   }
   else {
     return (
-      <table>
-        <tbody>
-          {
-            data.map((car: CarResponse) =>
-              <tr key={car._links.self.href}>
-                <td>{car.brand}</td>
-                <td>{car.model}</td>
-                <td>{car.color}</td>
-                <td>{car.registrationNumber}</td>
-                <td>{car.modelYear}</td>
-                <td>{car.price}</td>
-              </tr>
-            )
-          }
-        </tbody>
-      </table>
+      // <table>
+      //   <tbody>
+      //     {
+      //       data.map((car: CarResponse) =>
+      //         <tr key={car._links.self.href}>
+      //           <td>{car.brand}</td>
+      //           <td>{car.model}</td>
+      //           <td>{car.color}</td>
+      //           <td>{car.registrationNumber}</td>
+      //           <td>{car.modelYear}</td>
+      //           <td>{car.price}</td>
+      //         </tr>
+      //       )
+      //     }
+      //   </tbody>
+      // </table>
+      <DataGrid
+        rows={data}
+        columns={columns}
+        getRowId={row => row._links.self.href}
+      />  
     )
   }
 }
