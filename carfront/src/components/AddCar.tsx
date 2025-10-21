@@ -26,7 +26,27 @@ function AddCar() {
 
   const queryClient = useQueryClient();
 
-  const { mutate } = 
+  const { mutate } = useMutation(addCar, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["cars"]);
+    },
+    onError: err => {
+      console.log(err);
+    },
+  });
+
+  const handleSave = () => {
+    mutate(car);
+    setCar({
+      brand: '',
+      model: '',
+      color: '',
+      registrationNumber: '',
+      modelYear: 0,
+      price: 0
+    });
+    handleClickClose();
+  }
 
   return(
     <>
@@ -43,7 +63,7 @@ function AddCar() {
         </DialogContent>
         <DialogActions>
           <button onClick={handleClickClose}>Cancel | 취소</button>
-          <button onClick={handleClickClose}>Save | 저장</button>
+          <button onClick={handleSave}>Save | 저장</button>
         </DialogActions>
       </Dialog>
     </>
