@@ -1,14 +1,17 @@
 // EditCar.tsx
 import { ChangeEvent, useState } from "react";
-import { Car, CarResponse } from "../types";
+import { Car, CarResponse, CarEntity } from "../types";
 import { Dialog, DialogActions, DialogTitle } from "@mui/material";
 import CarDialogContent from "./CarDialogContent";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateCar } from "../api/carapi";
 
 type FormProps = {
   cardata: CarResponse
 }
 
 function EditCar({cardata}: FormProps) {
+  const queryClient = useQueryClient();
   const [ open, setOpen ] = useState(false);
   const [ car, setCar ] = useState<Car>({
     brand: '',
@@ -17,6 +20,15 @@ function EditCar({cardata}: FormProps) {
     registrationNumber: '',
     modelYear: 0,
     price: 0
+  });
+
+  const { mutate } = useMutation(updateCar, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["cars"]);
+    },
+    onError: err => {
+      console.log(err);
+    }
   });
 
   const handleClickOpen = () => {
@@ -37,6 +49,17 @@ function EditCar({cardata}: FormProps) {
   }
 
   const handleSave = () => {
+    const url = cardata._links.self.href;
+    const carEntity: CarEntity = { car, url };
+    mutate(carEntity);
+    setCar({
+      brand: '',
+      model: '',
+      color: '',
+      registrationNumber: '',
+      modelYear: 0,
+      price: 0
+    });
     setOpen(false);
   }
 
