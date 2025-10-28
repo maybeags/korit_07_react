@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from "react";
-import { Button, TextField, Snackbar, Divider, Box, CircularProgress, Stack } from "@mui/material";
+import { Button, TextField, Snackbar, Divider, Box, CircularProgress, Stack, Alert } from "@mui/material";
 import { AccountCredentials } from "../../types";
 import { login, authenticateWithGoogleToken } from "../api/shoppingapi";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
@@ -69,7 +69,7 @@ function Login({loginSuccess}: LoginProps) {
     setOpen(true);
   };
 
-  const handleKeyPress = ( event: KeyboardEvent ) => {
+  const handleKeyPress = ( event: KeyboardEvent<HTMLDivElement> ) => {
     if( event.key === 'Enter' && !loading ) {   // 로딩 중일 때는 엔터키로 로그인 못하게.
       handleUsernamePasswordLogin();
     }
@@ -98,12 +98,40 @@ function Login({loginSuccess}: LoginProps) {
           sx={{width: '300px'}}
         />
         <Button
-        
-        >{}
+          variant="contained"
+          color="primary"
+          onClick={handleUsernamePasswordLogin}
+          disabled={loading}
+          sx={{width: '300px'}}
+        >
+          {loading ? <CircularProgress size={24} color="inherit" /> : 'Login with Username'}
         </Button>
-      </Stack>
-      <Snackbar>
 
+        <Divider sx={{width:'300px', my: 2}}>OR</Divider>
+
+        {/* Google 로그인 버튼 부분입니다 */}
+        <Box sx={{width:'300px', display: 'flex', justifyContent: 'center', opacity: loading ? 0.5 : 1 }} >
+          {/** Loading 중일 때는 Google 버튼을 숨기거나 비활성화. 근데 우리는 위에 봤듯이 투명도 조절 */}
+          {!loading && (
+            <GoogleLogin
+              onSuccess={handleGoogleLoginSuccess}
+              onError={handleGoogleLoginError}
+              useOneTap={false}
+              width='300px'
+            />
+          )}
+          {loading && <CircularProgress size={24} />}
+        </Box>
+      </Stack>
+      <Snackbar
+        open={open}
+        autoHideDuration={4000}
+        onClose={() => setOpen(false)}
+        anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+      >
+        <Alert severity="error" onClose={() => setOpen(false)}>
+          {errorMsg}
+        </Alert>   
       </Snackbar>
     </>
   );

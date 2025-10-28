@@ -7,9 +7,13 @@ import { getItems, deleteItem } from "../api/shoppingapi"
 import { ShoppingItem } from "../../types"
 import AddItem from "../components/AddItem"
 import EditItem from "../components/EditItem"
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+
 
 import 'ag-grid-community/styles/ag-theme-material.css';
 import 'ag-grid-community/styles/ag-grid.css';
+
+ModuleRegistry.registerModules([ AllCommunityModule ]);
 
 
 function ShoppingItemList() {
@@ -20,15 +24,15 @@ function ShoppingItemList() {
 
   const queryClient = useQueryClient();
 
-  const { data: items, isLoading, isError, error } = useQuery<ShoppingItem[], Error>({
-    queryKey: ['items'],
+  const { data: shoppingItems, isLoading, isError, error } = useQuery<ShoppingItem[], Error>({
+    queryKey: ['shoppingItems'],
     queryFn: getItems,
   });
 
   const { mutate: deleteMutate } = useMutation({
     mutationFn: deleteItem,
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['items']});
+      queryClient.invalidateQueries({queryKey: ['shoppingItems']});
       setSnackBarMsg('해당 쇼핑 품목이 정상적으로 삭제되었습니다.');
       setSnackbarSeverity('success');
       setOpenSnackbar(true);
@@ -96,10 +100,10 @@ function ShoppingItemList() {
 
       <Box className='ag-theme-material' style={{height: 500, width: '100%'}}>
         <AgGridReact 
-          rowData={items}
+          rowData={shoppingItems}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={10}
+          paginationPageSize={20}
           onGridReady={onGridReady}
           animateRows={true}
           domLayout="autoHeight"

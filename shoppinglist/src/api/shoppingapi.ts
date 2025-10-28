@@ -14,6 +14,7 @@ const apiClient = axios.create({
 apiClient.interceptors.response.use(
   response => response,
   error => {
+    console.error('API Error Interceptor:', error.response || error.message || error);
     console.log('API Error : ', error.response || error.message || error);
     return Promise.reject(error.response?.data || new Error(error.message || '예상 못한 에러 발생'));
   }
@@ -35,6 +36,7 @@ export const login = async (creds : AccountCredentials): Promise<string> => {
   try {
     const response = await apiClient.post('/login', creds);
     const jwtToken = response.headers.authorization;
+    console.log('jwtToken in shoppingapi.ts : ', jwtToken);
     if(!jwtToken) {
       throw new Error('JWT 토큰이 headers에 담겨있지 않습니다.');
     }
@@ -53,22 +55,23 @@ export const login = async (creds : AccountCredentials): Promise<string> => {
 };
 
 export const getItems = async (): Promise<ShoppingItem[]> => {
-  const response = await apiClient.get('/api/items', getRequestConfig());
-  return response.data;
+  const response = await apiClient.get('/api/shoppingItems', getRequestConfig());
+  console.log(response);
+  return response.data._embedded.shoppingItems;
 }
 
 export const addItem = async (item: ShoppingItemEntry): Promise<ShoppingItem> => {
-  const response = await apiClient.post('/api/items', item, getRequestConfig());
+  const response = await apiClient.post('/api/shoppingitems', item, getRequestConfig());
   return response.data;
 }
 
 export const updateItem = async (id: number, itemUpdate: ShoppingItemEntry): Promise<ShoppingItem> => {
-  const response = await apiClient.put(`/api/items/${id}`, itemUpdate, getRequestConfig());
+  const response = await apiClient.put(`/api/shoppingitems/${id}`, itemUpdate, getRequestConfig());
   return response.data;
 }
 
 export const deleteItem = async (id: number) : Promise<void> => {
-  await apiClient.delete(`/api/items/${id}`, getRequestConfig());
+  await apiClient.delete(`/api/shoppingitems/${id}`, getRequestConfig());
 }
 
 // Google ID 토큰 백엔드 전송 및 JWT 수신 관련 함수
